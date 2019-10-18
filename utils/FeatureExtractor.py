@@ -1,8 +1,4 @@
-class FeatureExtractor(object):
-    
-    # extract age, gender, household_province information from id card
-    @staticmethod
-    def idn_features(df, col_name='idn', curr_year=2019, drop=True):
+def idn_features(df, col_name='idn', curr_year=2019, drop=True):
         loc_map = {110000: '北京市',120000: '天津市',130000: '河北省',140000: '山西省',150000: '内蒙古自治区',210000: '辽宁省',
                    220000: '吉林省',230000: '黑龙江省',310000: '上海市',320000: '江苏省',330000: '浙江省',340000: '安徽省',
                    350000: '福建省',360000: '江西省',370000: '山东省',410000: '河南省',420000: '湖北省',430000: '湖南省',
@@ -21,9 +17,9 @@ class FeatureExtractor(object):
             df.drop([col_name],1,inplace=True)
         return df
 
-    # 参考2018中国各省份gdp排名
-    @staticmethod
-    def province_gdp_rank(province):
+
+    
+def province_gdp_rank(province):
         if province in ['北京市','上海市','天津市','江苏省','浙江省','福建省','广东省','香港特别行政区','澳门特别行政区']:
             return 3
         elif province in ['山东省','内蒙古自治区','湖北省','重庆市','陕西省','辽宁省','吉林省']:
@@ -35,8 +31,8 @@ class FeatureExtractor(object):
         else:
             return 0
         
-    @staticmethod
-    def province_population_rank(province):
+
+def province_population_rank(province):
         if province in ['广东省','山东省','河南省','四川省','江苏省','河北省','湖南省','安徽省']:
             return 3
         elif province in ['湖北省','浙江省','广西壮族自治区','云南省','江西省','辽宁省','黑龙江省','陕西省']:
@@ -48,9 +44,8 @@ class FeatureExtractor(object):
         else:
             return 0
         
-    # refer http://www.ccutu.com/208510.html
-    @staticmethod
-    def province_edu_rank(province):
+# refer http://www.ccutu.com/208510.html
+def province_edu_rank(province):
         if province in ['北京市','江苏省','上海市','湖北省','山东省','广东省','浙江省','辽宁省','陕西省','香港特别行政区']:
             return 3
         elif province in ['四川省','河南省','湖南省','黑龙江省','安徽省','福建省','吉林省','河北省']:

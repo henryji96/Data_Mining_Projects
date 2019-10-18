@@ -21,7 +21,7 @@ class Classifier(object):
         score = pd.concat([score_lr, score_dt, score_rf, score_gbdt], 1)
         importance = pd.concat([coef_lr, importance_dt, importance_rf, importance_gbdt], 1)
         return score, importance
-    
+
     @staticmethod
     def logistic_reg(X_train, X_test, y_train, y_test):
         clf = LogisticRegression()
@@ -47,9 +47,9 @@ class Classifier(object):
         coef = pd.DataFrame(data = {
         'lr_feature': X_train.columns,
         'lr_coef_': clf.coef_[0]}).sort_values('lr_coef_',ascending=False).reset_index(drop=True)[['lr_feature','lr_coef_']]
-        
+
         return clf, coef, score_df
-    
+
     @staticmethod
     def decision_tree_clf(X_train, X_test, y_train, y_test):
         clf = DecisionTreeClassifier(random_state=0)
@@ -71,13 +71,13 @@ class Classifier(object):
         score_dict['DT_Test']['precision'] = precision_score(y_test, y_test_pred)
         score_dict['DT_Test']['roc_auc_score'] = roc_auc_score(y_test, y_test_pred_proba)
         score_df = pd.DataFrame(score_dict)[["DT_Train", "DT_Test"]]
-        
+
         importance = pd.DataFrame(data = {
         'dt_feature': X_train.columns,
         'dt_feature_importance': clf.feature_importances_.tolist()}).sort_values('dt_feature_importance',ascending=False).reset_index(drop=True)[['dt_feature','dt_feature_importance']]
-        
+
         return clf, importance, score_df
-    
+
     @staticmethod
     def random_forest_clf(X_train, X_test, y_train, y_test, n_estimators=100, max_depth=3):
         clf = RandomForestClassifier(n_estimators=n_estimators, max_depth = max_depth, random_state=0)
@@ -115,7 +115,7 @@ class Classifier(object):
         y_train_pred_proba = clf.predict_proba(X_train)[:,1]
         y_test_pred = clf.predict(X_test)
         y_test_pred_proba = clf.predict_proba(X_test)[:,1]
-        
+
         score_dict = {"GBDT_Train": {}, "GBDT_Test":  {}}
         score_dict['GBDT_Train']['f1'] = f1_score(y_train, y_train_pred)
         score_dict['GBDT_Train']['recall'] = recall_score(y_train, y_train_pred)
@@ -127,23 +127,23 @@ class Classifier(object):
         score_dict['GBDT_Test']['precision'] = precision_score(y_test, y_test_pred)
         score_dict['GBDT_Test']['roc_auc_score'] = roc_auc_score(y_test, y_test_pred_proba)
         score_df = pd.DataFrame(score_dict)[["GBDT_Train", "GBDT_Test"]]
-        
+
         importance = pd.DataFrame(data = {
         'gbdt_feature': X_train.columns,
         'gbdt_feature_importance': clf.feature_importances_.tolist()}).sort_values('gbdt_feature_importance',ascending=False).reset_index(drop=True)[['gbdt_feature','gbdt_feature_importance']]
-        
+
         return clf, importance, score_df
-    
-    
+
+
     def xgb_clf(X_train, X_test, y_train, y_test, booster = 'gbtree', learning_rate=0.1,
                 n_estimators=100, max_depth=3, \
                 reg_alpha=0, reg_lambda=0, n_jobs = -1, subsample = 1, colsample_bytree = 1):
         '''
         https://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.sklearn
         '''
-        clf = XGBClassifier(n_estimators=n_estimators, 
+        clf = XGBClassifier(n_estimators=n_estimators,
                             n_jobs = n_jobs,
-                            max_depth = max_depth, 
+                            max_depth = max_depth,
                             reg_alpha = reg_alpha,
                             reg_lambda = reg_lambda,
                             learning_rate = learning_rate,
@@ -174,9 +174,9 @@ class Classifier(object):
         'xgb_feature_importance': clf.feature_importances_.tolist()}).sort_values('xgb_feature_importance',ascending=False).reset_index(drop=True)[['xgb_feature','xgb_feature_importance']]
 
         return clf, importance, score_df
-    
-   
-    @staticmethod 
+
+
+    @staticmethod
     def classification_metrics(y_true, y_pred, y_pred_proba):
 
         roc_auc = roc_auc_score(y_true, y_pred_proba)
@@ -193,7 +193,7 @@ class Classifier(object):
         print(report)
         print()
 
-        print("confusion_matrix: \n")
+
         labels = np.unique(y_true)
         index = ['true: {}'.format(idx) for idx in labels]
         column = ['pred: {}'.format(idx) for idx in labels]
@@ -202,10 +202,12 @@ class Classifier(object):
         cm_df = pd.DataFrame(cm, columns = column, index = index)
 
         cm_normalized_df =  cm_df.div(cm_df.sum(axis=1), axis=0)
+        print("confusion_matrix: \n")
         print(cm_df)
-        print()
+        print("\n")
+        print("normalized_confusion_matrix: \n")
         print(cm_normalized_df)
-        
+
     @staticmethod
     def predict_proba_analysis(y_true, y_pred_proba, threshold = [0.3, 0.5, 0.8], plot_proba_violin = True, plot_thresohld_score=True):
             result = {'f1':[], 'recall':[], 'precision':[]}
@@ -230,10 +232,7 @@ class Classifier(object):
                 sns.violinplot(y = y_pred_proba, x = y_true)
                 plt.show()
             return result_df
-        
-    @staticmethod    
+
+    @staticmethod
     def pred_with_threshold(pred_proba, threshold):
         return list(map(lambda x: 0 if x < threshold else 1, pred_proba))
-
-
-            
